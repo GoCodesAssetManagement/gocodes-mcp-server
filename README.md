@@ -1,3 +1,5 @@
+<div align="center">
+
 # GoCodes MCP Server
 
 **Talk to your asset inventory. Ask questions, get answers — in plain English.**
@@ -7,7 +9,7 @@ through the Model Context Protocol (MCP).
 
 [![MCP](https://img.shields.io/badge/Model_Context_Protocol-compatible-6E56CF)](https://modelcontextprotocol.io)
 [![Auth](https://img.shields.io/badge/Auth-OAuth_2.1_+_PKCE-2B9348)](#security--privacy)
-[![Access](https://img.shields.io/badge/Access-read--only-1E6091)](#read-only-by-design)
+[![Writes](https://img.shields.io/badge/Writes-logged_%26_reversible-1E6091)](#safe-by-design)
 [![Website](https://img.shields.io/badge/gocodes.com-black)](https://gocodes.com)
 
 </div>
@@ -16,14 +18,14 @@ through the Model Context Protocol (MCP).
 
 ## What is this?
 
-The **GoCodes MCP Server** is a hosted connector that gives AI assistants secure, read-only
-access to your GoCodes asset data. Instead of clicking through screens and running reports,
-you just ask:
+The **GoCodes MCP Server** is a hosted connector that gives AI assistants secure access to
+your GoCodes asset data — look things up, run summaries, and make safe, logged edits to an
+asset when you ask. Instead of clicking through screens and running reports, you just ask:
 
 > *"Which assets are overdue for return?"*
 > *"Summarize the inventory checked out to the Denver crew."*
 > *"What maintenance is coming due in the next 30 days?"*
-> *"Show me the photo and full history for asset ABCD-1234."*
+> *"Set asset ABCD-1234's status to In Repair and move its home location to Bay 3."*
 
 Your AI assistant calls the GoCodes MCP server on your behalf, pulls live data from your
 account, and answers in seconds — with every request made **as you**, respecting your
@@ -39,7 +41,8 @@ existing permissions.
 - **Natural-language inventory** — ask questions instead of building reports.
 - **Live data** — answers come straight from your GoCodes account, not a stale export.
 - **Zero setup** — no servers, no API keys to manage. Add a connector URL and sign in.
-- **Secure by design** — OAuth 2.1 sign-in, per-user attribution, and **read-only** access.
+- **Secure by design** — OAuth 2.1 sign-in, per-user attribution, and edits that are
+  permission-gated, fully logged, and reversible.
 - **Works with the tools you already use** — any MCP-compatible client, including Claude.
 
 ## Getting started
@@ -51,7 +54,7 @@ Connecting takes about a minute.
 In your MCP-compatible client, add a new **remote MCP server / connector** using the hosted URL:
 
 ```
-https://mcp.gokodes.com        <!-- replace with your production endpoint -->
+https://mcp.gocodes.com/mcp
 ```
 
 <details>
@@ -85,8 +88,9 @@ Try one of the [example prompts](#example-prompts) below.
 
 ## What you can do
 
-The server exposes focused, read-only tools grouped by area. Your AI assistant picks the
-right one automatically based on what you ask.
+The server exposes focused tools grouped by area. Your AI assistant picks the right one
+automatically based on what you ask. All but two are read-only; the write tools are called
+out under [Editing and undo](#editing-and-undo).
 
 ### Assets
 
@@ -133,6 +137,16 @@ right one automatically based on what you ask.
 |------|--------------|
 | `list_customers` | Customers / assignees in your account. |
 
+### Editing and undo
+
+These are the only tools that change anything. Both require an account role that permits
+editing, and every change is written to the asset's audit history.
+
+| Tool | What it does |
+|------|--------------|
+| `update_asset` | Update the editable fields of a single asset — status, home location, assignment / check-out, service dates, costs, model, serial number, custom fields, and more. Only the fields you name change; every other field is left exactly as it was. |
+| `restore_assets` | Undo recent edits. Previews by default, then rolls the affected assets back to their earlier state for a chosen day or date range. Restores are themselves logged, so they can be undone too. |
+
 ## Example prompts
 
 ```text
@@ -143,6 +157,9 @@ Show me the details, current location, and photo for asset 275UUSQ4.
 List all tasks assigned to asset ABCD-1234.
 How many assets do we have by type, and what's their total current value?
 What's in the "Field Survey Kit"?
+Mark asset ABCD-1234 as checked out to Maria Gonzalez.
+Set the next service date for pump 275UUSQ4 to March 1st and its status to In Service.
+Undo the changes I made to my assets today.
 ```
 
 ## Security &amp; privacy
@@ -159,11 +176,21 @@ Security is built into the connection, not bolted on.
   expired sessions simply prompt you to sign in again.
 - **Encrypted in transit.** All traffic is over HTTPS.
 
-### Read-only by design
+### Safe by design
 
-Every tool is **read-only**. The MCP server can look up, list, and summarize your data — it
-**cannot** create, edit, move, check out, or delete anything in your GoCodes account. You can
-connect with confidence that an AI assistant won't change your records.
+Almost every tool is **read-only** — lookups, lists, and summaries. The one way the server
+can change anything is the **`update_asset`** tool, and it's fenced in on every side:
+
+- **Permission-gated.** Edits require an account role that already allows editing
+  (Administrator, Customer, Group Administrator, Asset Manager, or Asset Assigner). If your
+  role is view-only, the server simply can't write.
+- **Surgical.** Only the fields you name are changed; every other field on the asset is
+  preserved exactly as it was.
+- **Fully logged.** Every change is recorded in the asset's audit history, attributed to you.
+- **Reversible.** The **`restore_assets`** tool previews and then rolls back recent edits for
+  a day or date range — an undo button for anything an assistant changed.
+
+The server can **never create or delete** assets.
 
 ## Supported clients
 
@@ -194,7 +221,10 @@ plan details. <!-- confirm pricing/positioning -->
 <details>
 <summary><b>Can it change my data?</b></summary>
 
-No. Access is strictly read-only — see [Read-only by design](#read-only-by-design).
+Only in one specific, guarded way. The `update_asset` tool can edit fields on an asset — but
+only if your GoCodes role already permits editing, only the fields you ask it to, and every
+change is logged and reversible with `restore_assets`. It can never create or delete assets.
+See [Safe by design](#safe-by-design).
 </details>
 
 <details>
