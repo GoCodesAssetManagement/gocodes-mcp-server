@@ -215,7 +215,7 @@ account. Don't have one? [Start here](https://gocodes.com).
 <summary><b>Does this cost extra?</b></summary>
 
 Contact your GoCodes account representative or <support@gocodes.com> for availability and
-plan details. <!-- confirm pricing/positioning -->
+plan details.
 </details>
 
 <details>
@@ -236,7 +236,7 @@ existing permissions.
 
 ## Support
 
-- 📖 Product help: [gocodes.com](https://gocodes.com) <!-- link to docs/help center -->
+- 📖 Product help: [gocodes.com](https://support.gocodes.com)
 - ✉️ Email: <support@gocodes.com>
 - 🐛 Found an issue with the connector? [Open an issue](../../issues).
 
