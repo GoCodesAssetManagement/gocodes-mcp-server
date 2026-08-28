@@ -4,12 +4,12 @@
 
 **Talk to your asset inventory. Ask questions, get answers — in plain English.**
 
-Connect [GoCodes Asset Management](https://gocodes.com) to Claude and other AI assistants
-through the Model Context Protocol (MCP).
+Connect [GoCodes Asset Management](https://gocodes.com) to Claude, ChatGPT, and other AI
+assistants through the Model Context Protocol (MCP).
 
 [![MCP](https://img.shields.io/badge/Model_Context_Protocol-compatible-6E56CF)](https://modelcontextprotocol.io)
 [![Auth](https://img.shields.io/badge/Auth-OAuth_2.1_+_PKCE-2B9348)](#security--privacy)
-[![Writes](https://img.shields.io/badge/Writes-logged_%26_reversible-1E6091)](#safe-by-design)
+[![Writes](https://img.shields.io/badge/Writes-logged_%26_permission--gated-1E6091)](#safe-by-design)
 [![Website](https://img.shields.io/badge/gocodes.com-black)](https://gocodes.com)
 
 </div>
@@ -19,13 +19,15 @@ through the Model Context Protocol (MCP).
 ## What is this?
 
 The **GoCodes MCP Server** is a hosted connector that gives AI assistants secure access to
-your GoCodes asset data — look things up, run summaries, and make safe, logged edits to an
-asset when you ask. Instead of clicking through screens and running reports, you just ask:
+your GoCodes asset data — look things up, run summaries, and make safe, logged edits to
+assets and tasks when you ask. Instead of clicking through screens and running reports, you
+just ask:
 
 > *"Which assets are overdue for return?"*
 > *"Summarize the inventory checked out to the Denver crew."*
 > *"What maintenance is coming due in the next 30 days?"*
 > *"Set asset ABCD-1234's status to In Repair and move its home location to Bay 3."*
+> *"Create a task to service the generator, due Friday, and assign it to Maria."*
 
 Your AI assistant calls the GoCodes MCP server on your behalf, pulls live data from your
 account, and answers in seconds — with every request made **as you**, respecting your
@@ -41,15 +43,34 @@ existing permissions.
 - **Natural-language inventory** — ask questions instead of building reports.
 - **Live data** — answers come straight from your GoCodes account, not a stale export.
 - **Zero setup** — no servers, no API keys to manage. Add a connector URL and sign in.
+- **Currently in beta** — access is enabled per organization by email domain; see
+  [Request beta access](#1-request-beta-access).
 - **Secure by design** — OAuth 2.1 sign-in, per-user attribution, and edits that are
-  permission-gated, fully logged, and reversible.
-- **Works with the tools you already use** — any MCP-compatible client, including Claude.
+  permission-gated and fully logged.
+- **Works with the tools you already use** — any MCP-compatible client, including Claude
+  and ChatGPT.
 
 ## Getting started
 
-Connecting takes about a minute.
+> [!IMPORTANT]
+> The GoCodes MCP server is currently in **beta**, enabled organization by organization. Your
+> GoCodes email domain has to be approved before you can sign in — start with
+> [Request beta access](#1-request-beta-access) below.
 
-### 1. Add the connector
+### 1. Request beta access
+
+Email <support@gocodes.com> (or your GoCodes account representative) and ask to join the MCP
+beta. Once your organization is approved, your email domain is added to the allow-list and
+everyone on that domain can connect.
+
+Until then the sign-in page will refuse the login with an "access is restricted" message — see
+the [FAQ](#faq) if you run into that.
+
+> Participation is governed by the
+> [MCP Beta Terms of Service Addendum](https://gocodes.com/terms-of-service/mcpbeta/), which
+> applies in addition to your existing GoCodes agreement.
+
+### 2. Add the connector
 
 In your MCP-compatible client, add a new **remote MCP server / connector** using the hosted URL:
 
@@ -68,6 +89,15 @@ https://mcp.gocodes.com/mcp
 </details>
 
 <details>
+<summary><b>ChatGPT</b></summary>
+
+1. Open **Settings → Connectors** (availability depends on your ChatGPT plan).
+2. Add a new connector and paste the GoCodes MCP URL above.
+3. Complete the GoCodes sign-in when prompted.
+
+</details>
+
+<details>
 <summary><b>Other MCP clients</b></summary>
 
 Any client that supports **remote MCP servers with OAuth** can connect. Point it at the
@@ -76,21 +106,21 @@ first connection.
 
 </details>
 
-### 2. Sign in with GoCodes
+### 3. Sign in with GoCodes
 
 The first time you connect, you'll be redirected to the **GoCodes login page**. Sign in with
-your normal GoCodes email and password. That's it — your client is now connected, and the
-server acts as you for every request.
+your normal GoCodes email and password — the same credentials you use for GoCodes. That's it:
+your client is now connected, and the server acts as you for every request.
 
-### 3. Ask away
+### 4. Ask away
 
 Try one of the [example prompts](#example-prompts) below.
 
 ## What you can do
 
 The server exposes focused tools grouped by area. Your AI assistant picks the right one
-automatically based on what you ask. All but two are read-only; the write tools are called
-out under [Editing and undo](#editing-and-undo).
+automatically based on what you ask. Most are read-only; the tools that can change data are
+listed under [Editing and undo](#editing-and-undo).
 
 ### Assets
 
@@ -100,7 +130,7 @@ out under [Editing and undo](#editing-and-undo).
 | `get_asset_details` | Full detail record for a single asset by its GoCodes ID. |
 | `get_asset_history` | Complete audit/change log for an asset. |
 | `get_asset_assignment_history` | Check-out / assignment history: who had it and for how long. |
-| `get_asset_location` | Current location of an asset. |
+| `get_asset_location` | The asset's last recorded location (GPS coordinates and the date). |
 | `get_asset_picture` | The asset's photo, returned inline. |
 | `get_assets_batch` | Details for several assets at once. |
 | `list_assets_by_location` | Assets at a location, or a per-location count summary. |
@@ -139,13 +169,29 @@ out under [Editing and undo](#editing-and-undo).
 
 ### Editing and undo
 
-These are the only tools that change anything. Both require an account role that permits
-editing, and every change is written to the asset's audit history.
+These are the only tools that change anything. Each one requires an account role that
+already permits the change, and every edit is recorded in your account's history.
+
+**Assets**
 
 | Tool | What it does |
 |------|--------------|
 | `update_asset` | Update the editable fields of a single asset — status, home location, assignment / check-out, service dates, costs, model, serial number, custom fields, and more. Only the fields you name change; every other field is left exactly as it was. |
-| `restore_assets` | Undo recent edits. Previews by default, then rolls the affected assets back to their earlier state for a chosen day or date range. Restores are themselves logged, so they can be undone too. |
+| `restore_assets` | Undo recent **asset** edits. Previews by default, then rolls the affected assets back to their earlier state for a chosen day or date range. Restores are themselves logged, so they can be undone too. |
+
+**Tasks** *(requires the Tasks feature on your account)*
+
+| Tool | What it does |
+|------|--------------|
+| `create_task` | Create a task on an asset — name, description, due date, cost, priority, and optionally assign it in one step. |
+| `update_task` | Edit an existing task. As with assets, only the fields you name change; the rest are preserved. |
+| `assign_task` | Assign a task to a user by email — or leave the email out to unassign it. |
+| `update_task_status` | Change only a task's status (e.g. to In Progress or Completed). |
+
+> [!IMPORTANT]
+> **`restore_assets` undoes asset edits only.** Task changes are recorded in your account's
+> history but are not covered by the one-step restore — review task edits before confirming
+> them.
 
 ## Example prompts
 
@@ -159,6 +205,8 @@ How many assets do we have by type, and what's their total current value?
 What's in the "Field Survey Kit"?
 Mark asset ABCD-1234 as checked out to Maria Gonzalez.
 Set the next service date for pump 275UUSQ4 to March 1st and its status to In Service.
+Create a task to replace the filter on 275UUSQ4, due next Friday, assigned to Maria.
+Mark the inspection task on ABCD-1234 as Completed.
 Undo the changes I made to my assets today.
 ```
 
@@ -178,25 +226,30 @@ Security is built into the connection, not bolted on.
 
 ### Safe by design
 
-Almost every tool is **read-only** — lookups, lists, and summaries. The one way the server
-can change anything is the **`update_asset`** tool, and it's fenced in on every side:
+Most tools are **read-only** — lookups, lists, and summaries. The handful that can change
+data are fenced in on every side:
 
-- **Permission-gated.** Edits require an account role that already allows editing
-  (Administrator, Customer, Group Administrator, Asset Manager, or Asset Assigner). If your
+- **Permission-gated.** Editing an asset requires a role that already allows editing
+  (Administrator, Customer, Group Administrator, Asset Manager, or Asset Assigner). Creating
+  and editing **tasks** is narrower still — Administrator, Group Administrator, or Asset
+  Manager — with Asset Assigners also able to assign tasks and change their status. If your
   role is view-only, the server simply can't write.
-- **Surgical.** Only the fields you name are changed; every other field on the asset is
-  preserved exactly as it was.
-- **Fully logged.** Every change is recorded in the asset's audit history, attributed to you.
-- **Reversible.** The **`restore_assets`** tool previews and then rolls back recent edits for
-  a day or date range — an undo button for anything an assistant changed.
+- **Surgical.** Only the fields you name are changed; every other field on the asset or task
+  is preserved exactly as it was. Values replace the existing field rather than being
+  appended to it.
+- **Fully logged.** Changes are recorded in your account's history, attributed to you.
+- **Reversible (assets).** The **`restore_assets`** tool previews and then rolls back recent
+  asset edits for a day or date range — an undo button for asset changes an assistant made.
 
-The server can **never create or delete** assets.
+The server can **never delete anything**, and it never creates or deletes assets. The only
+thing it can create is a task, and only when you ask.
 
 ## Supported clients
 
 Any MCP client that supports **remote servers with OAuth** works, including:
 
 - **Claude** — web and desktop (Connectors)
+- **ChatGPT** — Connectors (availability varies by plan)
 - Other MCP-compatible assistants and IDE integrations
 
 New clients are adopting remote MCP + OAuth quickly; if yours supports it, GoCodes will
@@ -219,12 +272,29 @@ plan details.
 </details>
 
 <details>
+<summary><b>I get an "access is restricted" message when I sign in</b></summary>
+
+That means your organization hasn't been approved for the beta yet. Access is granted by email
+domain, so once your organization is approved, everyone on that domain can sign in. Email
+<support@gocodes.com> or your account representative to request access — see
+[Request beta access](#1-request-beta-access).
+</details>
+
+<details>
+<summary><b>What terms apply during the beta?</b></summary>
+
+The [MCP Beta Terms of Service Addendum](https://gocodes.com/terms-of-service/mcpbeta/) governs
+use of the MCP server during the beta, in addition to your existing GoCodes agreement.
+</details>
+
+<details>
 <summary><b>Can it change my data?</b></summary>
 
-Only in one specific, guarded way. The `update_asset` tool can edit fields on an asset — but
-only if your GoCodes role already permits editing, only the fields you ask it to, and every
-change is logged and reversible with `restore_assets`. It can never create or delete assets.
-See [Safe by design](#safe-by-design).
+Only in specific, guarded ways. It can edit fields on an **asset**, and create or edit
+**tasks** — but only if your GoCodes role already permits that change, only the fields you
+ask it to, and every change is logged and attributed to you. Asset edits can be rolled back
+with `restore_assets`. The server can never delete anything, and never creates or deletes
+assets. See [Safe by design](#safe-by-design).
 </details>
 
 <details>
@@ -234,11 +304,20 @@ Exactly the ones you can see in GoCodes. The server acts under your identity and
 existing permissions.
 </details>
 
+<details>
+<summary><b>Why can't I see the task tools?</b></summary>
+
+The task tools require the **Tasks** feature to be enabled on your GoCodes account, and a
+role that permits task changes. If tasks aren't enabled, those tools will report that rather
+than making a change. Contact your account representative to enable them.
+</details>
+
 ## Support
 
 - 📖 Product help: [gocodes.com](https://support.gocodes.com)
 - ✉️ Email: <support@gocodes.com>
 - 🐛 Found an issue with the connector? [Open an issue](../../issues).
+- 📄 Beta terms: [MCP Beta Terms of Service Addendum](https://gocodes.com/terms-of-service/mcpbeta/)
 
 ## About GoCodes
 
