@@ -86,6 +86,9 @@ https://mcp.gocodes.com/mcp
 3. Paste the GoCodes MCP URL above and save.
 4. Click **Connect** and complete the GoCodes sign-in (next step).
 
+📖 Step-by-step with screenshots:
+[Connecting GoCodes to Claude](https://support.gocodes.com/en/articles/16736644-connecting-gocodes-to-claude)
+
 </details>
 
 <details>
@@ -94,6 +97,9 @@ https://mcp.gocodes.com/mcp
 1. Open **Settings → Connectors** (availability depends on your ChatGPT plan).
 2. Add a new connector and paste the GoCodes MCP URL above.
 3. Complete the GoCodes sign-in when prompted.
+
+📖 Step-by-step with screenshots:
+[Connect GoCodes to ChatGPT on the web](https://support.gocodes.com/en/articles/16736559-connect-gocodes-to-chatgpt-on-the-web)
 
 </details>
 
