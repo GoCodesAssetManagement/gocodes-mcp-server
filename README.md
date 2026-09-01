@@ -35,36 +35,26 @@ existing permissions.
 
 > [!NOTE]
 > This repository is documentation for the **hosted** GoCodes MCP service. There is nothing
-> to build or install — you connect your AI client to a URL and sign in with your GoCodes
+> to build or install — you connect your AI client and sign in with your GoCodes
 > account.
 
 ## Why use it
 
 - **Natural-language inventory** — ask questions instead of building reports.
 - **Live data** — answers come straight from your GoCodes account, not a stale export.
-- **Zero setup** — no servers, no API keys to manage. Add a connector URL and sign in.
-- **Currently in beta** — access is enabled per organization by email domain; see
-  [Request beta access](#1-request-beta-access).
+- **Zero setup** — no servers, no API keys to manage. Add a connector/plugin and sign in.
+- **Currently in beta** — available to all users including free trial users.
 - **Secure by design** — OAuth 2.1 sign-in, per-user attribution, and edits that are
   permission-gated and fully logged.
-- **Works with the tools you already use** — any MCP-compatible client, including Claude
-  and ChatGPT.
+- **Works with the tools you already use** — any MCP-compatible client, including Claude (just add the GoCodes connector)
+  and ChatGPT (just add the GoCodes plugin).
 
 ## Getting started
 
 > [!IMPORTANT]
-> The GoCodes MCP server is currently in **beta**, enabled organization by organization. Your
-> GoCodes email domain has to be approved before you can sign in — start with
-> [Request beta access](#1-request-beta-access) below.
+> The GoCodes MCP server is currently in **beta**
 
-### 1. Request beta access
-
-Email <support@gocodes.com> (or your GoCodes account representative) and ask to join the MCP
-beta. Once your organization is approved, your email domain is added to the allow-list and
-everyone on that domain can connect.
-
-Until then the sign-in page will refuse the login with an "access is restricted" message — see
-the [FAQ](#faq) if you run into that.
+### 1. Beta Terms of Service
 
 > Participation is governed by the
 > [MCP Beta Terms of Service Addendum](https://gocodes.com/terms-of-service/mcpbeta/), which
@@ -72,36 +62,11 @@ the [FAQ](#faq) if you run into that.
 
 ### 2. Add the connector
 
-In your MCP-compatible client, add a new **remote MCP server / connector** using the hosted URL:
+Claude and ChatGPT offer dedicated GoCodes Connector(Plugin) available with zero set up required. For other MCP-compatible clients, add a new **remote MCP server / connector** using the hosted URL:
 
 ```
 https://mcp.gocodes.com/mcp
 ```
-
-<details>
-<summary><b>Claude (web &amp; desktop)</b></summary>
-
-1. Open **Settings → Connectors**.
-2. Choose **Add custom connector**.
-3. Paste the GoCodes MCP URL above and save.
-4. Click **Connect** and complete the GoCodes sign-in (next step).
-
-📖 Step-by-step with screenshots:
-[Connecting GoCodes to Claude](https://support.gocodes.com/en/articles/16736644-connecting-gocodes-to-claude)
-
-</details>
-
-<details>
-<summary><b>ChatGPT</b></summary>
-
-1. Open **Settings → Connectors** (availability depends on your ChatGPT plan).
-2. Add a new connector and paste the GoCodes MCP URL above.
-3. Complete the GoCodes sign-in when prompted.
-
-📖 Step-by-step with screenshots:
-[Connect GoCodes to ChatGPT on the web](https://support.gocodes.com/en/articles/16736559-connect-gocodes-to-chatgpt-on-the-web)
-
-</details>
 
 <details>
 <summary><b>Other MCP clients</b></summary>
@@ -236,8 +201,8 @@ Most tools are **read-only** — lookups, lists, and summaries. The handful that
 data are fenced in on every side:
 
 - **Permission-gated.** Editing an asset requires a role that already allows editing
-  (Administrator, Customer, Group Administrator, Asset Manager, or Asset Assigner). Creating
-  and editing **tasks** is narrower still — Administrator, Group Administrator, or Asset
+  (Group Administrator or Asset Manager). Creating
+  and editing **tasks** is Group Administrator, or Asset
   Manager — with Asset Assigners also able to assign tasks and change their status. If your
   role is view-only, the server simply can't write.
 - **Surgical.** Only the fields you name are changed; every other field on the asset or task
@@ -255,7 +220,7 @@ thing it can create is a task, and only when you ask.
 Any MCP client that supports **remote servers with OAuth** works, including:
 
 - **Claude** — web and desktop (Connectors)
-- **ChatGPT** — Connectors (availability varies by plan)
+- **ChatGPT** — Plugins (availability varies by plan)
 - Other MCP-compatible assistants and IDE integrations
 
 New clients are adopting remote MCP + OAuth quickly; if yours supports it, GoCodes will
@@ -273,17 +238,7 @@ account. Don't have one? [Start here](https://gocodes.com).
 <details>
 <summary><b>Does this cost extra?</b></summary>
 
-Contact your GoCodes account representative or <support@gocodes.com> for availability and
-plan details.
-</details>
-
-<details>
-<summary><b>I get an "access is restricted" message when I sign in</b></summary>
-
-That means your organization hasn't been approved for the beta yet. Access is granted by email
-domain, so once your organization is approved, everyone on that domain can sign in. Email
-<support@gocodes.com> or your account representative to request access — see
-[Request beta access](#1-request-beta-access).
+No
 </details>
 
 <details>
