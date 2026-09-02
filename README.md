@@ -191,9 +191,18 @@ Security is built into the connection, not bolted on.
 - **You, not a shared robot.** Every request to GoCodes is made under *your* identity, so
   your row-level permissions apply and your audit trail stays accurate. There is no shared
   service account.
-- **Short-lived sessions.** Access tokens are short-lived and refreshed automatically;
-  expired sessions simply prompt you to sign in again.
+- **Token lifetimes.** Authorization codes last 5 minutes. Access tokens last 15 minutes and
+  refresh automatically. Refresh tokens and the login cookie last 8 hours.
 - **Encrypted in transit.** All traffic is over HTTPS.
+- **Rate limited.** 100 requests per minute, per user. Requests beyond that are throttled.
+- **Data retention.** The server reads from your account live and does not create a second
+  copy. GoCodes does not retain MCP request or response content.
+- **No AI training on your data.** GoCodes does not permit AI providers to train on customer
+  data. Nothing is shared beyond the session context needed to answer the request.
+- **Hosted on Azure.** GoCodes hosts the server on Microsoft Azure in the US East region, with
+  offsite backups to alternate Azure locations.
+- **View-only users.** Write tools remain visible to the client but return a permission error
+  instead of applying a change if your role doesn't allow the edit.
 
 ### Safe by design
 
