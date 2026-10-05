@@ -19,8 +19,8 @@ assistants through the Model Context Protocol (MCP).
 ## What is this?
 
 The **GoCodes MCP Server** is a hosted connector that gives AI assistants secure access to
-your GoCodes asset data — look things up, run summaries, and make safe, logged edits to
-assets and tasks when you ask. Instead of clicking through screens and running reports, you
+your GoCodes asset data — look things up, run summaries, activate new asset tags, and make
+safe, logged edits to assets and tasks when you ask. Instead of clicking through screens and running reports, you
 just ask:
 
 > *"Which assets are overdue for return?"*
@@ -99,7 +99,7 @@ listed under [Editing and undo](#editing-and-undo).
 |------|--------------|
 | `search_assets` | Free-text search across the inventory (name, ID, serial, model, …). |
 | `get_asset_details` | Full detail record for a single asset by its GoCodes ID. |
-| `get_asset_history` | Complete audit/change log for an asset. |
+| `get_asset_change_history` | Complete audit/change log for an asset. |
 | `get_asset_assignment_history` | Check-out / assignment history: who had it and for how long. |
 | `get_asset_location` | The asset's last recorded location (GPS coordinates and the date). |
 | `get_asset_picture` | The asset's photo, returned inline. |
@@ -107,11 +107,11 @@ listed under [Editing and undo](#editing-and-undo).
 | `list_assets_by_location` | Assets at a location, or a per-location count summary. |
 | `list_checked_out_assets` | Everything currently checked out, with assignee and due date. |
 | `list_overdue_assets` | Checked-out assets past their return date, most overdue first. |
-| `list_maintenance_due` | Assets with upcoming or overdue scheduled service. |
+| `list_service_due_assets` | Assets with upcoming or overdue scheduled service. |
 | `list_asset_types` | The asset types defined in your account. |
 | `list_asset_attachments` | Files attached to an asset. |
 | `get_custom_field_schema` | Your account's custom-field definitions. |
-| `summarize_customer_inventory` | Account-wide or per-assignee inventory summary (totals, value, breakdowns). |
+| `summarize_inventory` | Account-wide or per-assignee inventory summary (totals, value, breakdowns). |
 
 ### Kits
 
@@ -124,19 +124,19 @@ listed under [Editing and undo](#editing-and-undo).
 
 | Tool | What it does |
 |------|--------------|
-| `list_tasks` | All tasks, with due dates, assigned assets, and customer info. |
+| `list_tasks` | All tasks, with due dates, assigned assets, and assignee info. |
 | `get_task_details` | Full detail for a single task. |
 | `get_tasks_for_asset` | Every task assigned to a given asset. |
 | `list_my_tasks` | Tasks assigned to you. |
 | `list_task_statuses` | The task statuses configured in your account. |
 | `list_task_attachments` | Files attached to a task. |
-| `list_upcoming_events` | Upcoming scheduled events. |
+| `list_upcoming_due_dates` | Upcoming return, service, end-of-life, and task due dates. |
 
-### Account
+### People
 
 | Tool | What it does |
 |------|--------------|
-| `list_customers` | Customers / assignees in your account. |
+| `list_assignees` | The people in your account that assets and tasks can be assigned to. |
 
 ### Editing and undo
 
@@ -148,7 +148,8 @@ already permits the change, and every edit is recorded in your account's history
 | Tool | What it does |
 |------|--------------|
 | `update_asset` | Update the editable fields of a single asset — status, home location, assignment / check-out, service dates, costs, model, serial number, custom fields, and more. Only the fields you name change; every other field is left exactly as it was. |
-| `restore_assets` | Undo recent **asset** edits. Previews by default, then rolls the affected assets back to their earlier state for a chosen day or date range. Restores are themselves logged, so they can be undone too. |
+| `activate_asset` | Activate an unused GoCodes tag you have on hand (the code printed on the label), creating a new asset for it in your account — optionally with its type, serial number, model, and description. |
+| `undo_asset_changes` | Undo your recent **asset** edits. Previews by default, then rolls the affected assets back to their earlier state for a chosen day or date range. Undos are themselves logged, so they can be undone too. |
 
 **Tasks** *(requires the Tasks feature on your account)*
 
@@ -160,8 +161,8 @@ already permits the change, and every edit is recorded in your account's history
 | `update_task_status` | Change only a task's status (e.g. to In Progress or Completed). |
 
 > [!IMPORTANT]
-> **`restore_assets` undoes asset edits only.** Task changes are recorded in your account's
-> history but are not covered by the one-step restore — review task edits before confirming
+> **`undo_asset_changes` undoes asset edits only.** Task changes are recorded in your account's
+> history but are not covered by the one-step undo — review task edits before confirming
 > them.
 
 ## Example prompts
@@ -178,6 +179,7 @@ Mark asset ABCD-1234 as checked out to Maria Gonzalez.
 Set the next service date for pump 275UUSQ4 to March 1st and its status to In Service.
 Create a task to replace the filter on 275UUSQ4, due next Friday, assigned to Maria.
 Mark the inspection task on ABCD-1234 as Completed.
+Activate tag ABCD-5678 as a new laptop with serial number SN-10442.
 Undo the changes I made to my assets today.
 ```
 
@@ -210,7 +212,8 @@ Most tools are **read-only** — lookups, lists, and summaries. The handful that
 data are fenced in on every side:
 
 - **Permission-gated.** Editing an asset requires a role that already allows editing
-  (Group Administrator or Asset Manager). Creating
+  (Group Administrator, Asset Manager, or Asset Assigner). Activating a new asset tag requires
+  Group Administrator or Asset Manager. Creating
   and editing **tasks** is Group Administrator, or Asset
   Manager — with Asset Assigners also able to assign tasks and change their status. If your
   role is view-only, the server simply can't write.
@@ -218,11 +221,11 @@ data are fenced in on every side:
   is preserved exactly as it was. Values replace the existing field rather than being
   appended to it.
 - **Fully logged.** Changes are recorded in your account's history, attributed to you.
-- **Reversible (assets).** The **`restore_assets`** tool previews and then rolls back recent
+- **Reversible (assets).** The **`undo_asset_changes`** tool previews and then rolls back recent
   asset edits for a day or date range — an undo button for asset changes an assistant made.
 
-The server can **never delete anything**, and it never creates or deletes assets. The only
-thing it can create is a task, and only when you ask.
+The server can **never delete anything**. The only things it can create are a task, or a new
+asset when you activate an unused tag — and only when you ask.
 
 ## Supported clients
 
@@ -260,11 +263,11 @@ use of the MCP server during the beta, in addition to your existing GoCodes agre
 <details>
 <summary><b>Can it change my data?</b></summary>
 
-Only in specific, guarded ways. It can edit fields on an **asset**, and create or edit
-**tasks** — but only if your GoCodes role already permits that change, only the fields you
-ask it to, and every change is logged and attributed to you. Asset edits can be rolled back
-with `restore_assets`. The server can never delete anything, and never creates or deletes
-assets. See [Safe by design](#safe-by-design).
+Only in specific, guarded ways. It can edit fields on an **asset**, activate an unused tag as
+a new asset, and create or edit **tasks** — but only if your GoCodes role already permits that
+change, only the fields you ask it to, and every change is logged and attributed to you. Asset
+edits can be rolled back with `undo_asset_changes`. The server can never delete anything. See
+[Safe by design](#safe-by-design).
 </details>
 
 <details>
