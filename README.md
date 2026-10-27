@@ -4,8 +4,8 @@
 
 **Talk to your asset inventory. Ask questions, get answers — in plain English.**
 
-Connect [GoCodes Asset Management](https://gocodes.com) to Claude, ChatGPT, and other AI
-assistants through the Model Context Protocol (MCP).
+Connect [GoCodes Asset Management](https://gocodes.com) to Claude, ChatGPT, Microsoft Copilot,
+and other AI assistants through the Model Context Protocol (MCP).
 
 [![MCP](https://img.shields.io/badge/Model_Context_Protocol-compatible-6E56CF)](https://modelcontextprotocol.io)
 [![Auth](https://img.shields.io/badge/Auth-OAuth_2.1_+_PKCE-2B9348)](#security--privacy)
@@ -46,8 +46,8 @@ existing permissions.
 - **Currently in beta** — available to all users including free trial users.
 - **Secure by design** — OAuth 2.1 sign-in, per-user attribution, and edits that are
   permission-gated and fully logged.
-- **Works with the tools you already use** — any MCP-compatible client, including Claude (just add the GoCodes connector)
-  and ChatGPT (just add the GoCodes plugin).
+- **Works with the tools you already use** — any MCP-compatible client, including Claude (just add the GoCodes connector),
+  ChatGPT (just add the GoCodes plugin), and Microsoft Copilot (add GoCodes to a Copilot Studio agent).
 
 ## Getting started
 
@@ -62,11 +62,21 @@ existing permissions.
 
 ### 2. Add the connector
 
-Claude and ChatGPT offer dedicated GoCodes Connector(Plugin) available with zero set up required. For other MCP-compatible clients, add a new **remote MCP server / connector** using the hosted URL:
+Claude and ChatGPT offer dedicated GoCodes Connector(Plugin) available with zero set up required. For Microsoft Copilot and other MCP-compatible clients, add a new **remote MCP server / connector** using the hosted URL:
 
 ```
 https://mcp.gocodes.com/mcp
 ```
+
+<details>
+<summary><b>Microsoft Copilot (Copilot Studio)</b></summary>
+
+In Copilot Studio, add GoCodes to your agent as a **Model Context Protocol** server, using the
+hosted URL above and **OAuth 2.0** authentication. Copilot Studio creates a Power Platform
+connector for it. Connectors belong to one Power Platform environment, so create it once per
+environment and share it with your users.
+
+</details>
 
 <details>
 <summary><b>Other MCP clients</b></summary>
@@ -80,8 +90,15 @@ first connection.
 ### 3. Sign in with GoCodes
 
 The first time you connect, you'll be redirected to the **GoCodes login page**. Sign in with
-your normal GoCodes email and password — the same credentials you use for GoCodes. That's it:
-your client is now connected, and the server acts as you for every request.
+your normal GoCodes email and password — the same credentials you use for GoCodes.
+
+GoCodes then shows an **approval page** naming the AI assistant that is asking for access and
+what it will be able to do. Click **Allow** to finish connecting, or **Deny** to cancel. Only
+allow it if you started connecting GoCodes yourself just now — if you followed a link someone
+sent you, choose **Deny**.
+
+That's it: your client is now connected, and the server acts as you for every request. Your
+sign-in lasts 8 hours; after that, your client asks you to sign in and approve again.
 
 ### 4. Ask away
 
@@ -190,6 +207,9 @@ Security is built into the connection, not bolted on.
 - **OAuth 2.1 with PKCE.** You sign in through the official GoCodes login — your credentials
   are never shared with the AI client or stored by it. The client receives only a scoped,
   expiring token.
+- **You approve every connection.** After sign-in, GoCodes shows which assistant is asking and
+  where access will be sent, and issues nothing until you click **Allow**. Being signed in to
+  GoCodes is never enough on its own to connect an assistant.
 - **You, not a shared robot.** Every request to GoCodes is made under *your* identity, so
   your row-level permissions apply and your audit trail stays accurate. There is no shared
   service account.
@@ -233,6 +253,7 @@ Any MCP client that supports **remote servers with OAuth** works, including:
 
 - **Claude** — web and desktop (Connectors)
 - **ChatGPT** — Plugins (availability varies by plan)
+- **Microsoft Copilot** — Copilot Studio agents (MCP server with OAuth 2.0)
 - Other MCP-compatible assistants and IDE integrations
 
 New clients are adopting remote MCP + OAuth quickly; if yours supports it, GoCodes will
